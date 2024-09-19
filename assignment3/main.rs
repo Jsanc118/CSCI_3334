@@ -31,6 +31,6 @@ fn main() {
         }
     }
 
-
+   
     println!("You guessed the number in {} attempts!", attempts);
 }
