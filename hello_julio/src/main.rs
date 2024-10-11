@@ -1,28 +1,52 @@
+use std::fs::File;
+use std::io::{Write, BufReader, BufRead};
 
-fn fahrenheit_to_celsius(f: f64) -> f64 {
-    (f - 32.0) * 5.0 / 9.0
+struct Book {
+    title: String,
+    author: String,
+    year: u16,
 }
 
-fn celsius_to_fahrenheit(c: f64) -> f64 {
-    (c * 9.0 / 5.0) + 32.0
+fn save_books(books: &Vec<Book>, filename: &str) {
+   let mut file = File::create("books.txt").unwrap(); // TODO: Implement this function
+  for Book in books
+    { 
+         writeln!(file, "{},{},{}", Book.title, Book.author, Book.year).unwrap(); 
+    }// Hint: Use File::create() and write!() macro
+}
+
+fn load_books(filename: &str) -> Vec<Book> {
+    let file = File::open(filename).expect("Failed to open file");// TODO: Implement this function
+    let reader = BufReader::new(file);
+    
+    let mut books : Vec<Book> = vec![];
+
+    for line in reader.lines()
+    {
+        let line = line.unwrap();
+   let mut parts = line.split(',');
+   let title = parts.next().unwrap().to_string();
+   let author = parts.next().unwrap().to_string();
+   let year_str = parts.next().expect("Missing Year").trim();
+   let year = year_str.parse::<u16>().expect("Failed to parse year");
+   books.push(Book {title, author, year});         
+}
+return books;
+ // Hint: Use File::open() and BufReader
 }
 
 fn main() {
-    
-    let mut temp_f = 32.0;
+    let books = vec![
+        Book { title: "1984".to_string(), author: "George Orwell".to_string(), year: 1949 },
+        Book { title: "To Kill a Mockingbird".to_string(), author: "Harper Lee".to_string(), year: 1960 },
+    ];
 
-    
-    let temp_c = fahrenheit_to_celsius(temp_f);
-    println!("{:.2}°F is {:.2}°C", temp_f, temp_c);
+    save_books(&books, "books.txt");
+    println!("Books saved to file.");
 
-    
-    let back_to_f = celsius_to_fahrenheit(temp_c);
-    println!("{:.2}°C is {:.2}°F", temp_c, back_to_f);
-
-    for _ in 1..=5 {
-        temp_f += 1.0;
-        let temp_c = fahrenheit_to_celsius(temp_f);
-        let back_to_f = celsius_to_fahrenheit(temp_c);
-        println!("{:.2}°F is {:.2}°C | {:.2}°C is {:.2}°F", temp_f, temp_c, temp_c, back_to_f);
+    let loaded_books = load_books("books.txt");
+    println!("Loaded books:");
+    for book in loaded_books {
+        println!("{} by {}, published in {}", book.title, book.author, book.year);
     }
 }
